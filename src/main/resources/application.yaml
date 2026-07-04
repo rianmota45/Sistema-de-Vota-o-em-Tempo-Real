@@ -1,0 +1,3 @@
+spring:
+  application:
+    name: Sistema-De-Votacao-Em-Tempo-Real
