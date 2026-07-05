@@ -1,4 +1,4 @@
-package Infrastructure.Entity;
+package org.example.sistemadevotacaoemtemporeal.Infrastructure.Entity;
 
 import java.time.LocalDate;
 import java.util.UUID;

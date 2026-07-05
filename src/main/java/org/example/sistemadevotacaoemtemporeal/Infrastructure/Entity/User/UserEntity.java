@@ -1,4 +1,4 @@
-package Infrastructure.Entity.User;
+package org.example.sistemadevotacaoemtemporeal.Infrastructure.Entity.User;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -23,13 +23,16 @@ import java.util.UUID;
 @Setter
 @Entity
 public class UserEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID userID;
     @Column(nullable = false)
     private String userName;
     @Column(unique = true)
     private String userEmail;
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID userID;
+
+    public UserEntity() {
+    }
 
     public UserEntity(String userName, String userEmail) {
         this.userName = userName;
@@ -37,7 +40,6 @@ public class UserEntity {
             this.userName = ("User" + (Math.round(Math.random() * 1000)));
         }
         this.userEmail = userEmail;
-        this.userID = UUID.randomUUID();
     }
 
     @Override
