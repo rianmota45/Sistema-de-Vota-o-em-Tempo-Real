@@ -2,6 +2,8 @@ package org.example.sistemadevotacaoemtemporeal.Controller;
 
 import dto.user_dto.UserRequestDTO;
 import dto.user_dto.UserResponseDTO;
+import dto.user_dto.pool_dto.PoolRequestDTO;
+import dto.user_dto.pool_dto.PoolResponseDTO;
 import org.example.sistemadevotacaoemtemporeal.Infrastructure.Entity.Pool.PoolEntity;
 import org.example.sistemadevotacaoemtemporeal.Service.VoteService;
 import lombok.RequiredArgsConstructor;
@@ -37,8 +39,9 @@ public class VoteController {
     }
 
     @PostMapping("/create-pool")
-    public ResponseEntity<PoolEntity> createPool(){
-        return ResponseEntity.ok(voteService.createPool());
+    public ResponseEntity<PoolResponseDTO> createPool(@RequestBody PoolRequestDTO poolRequestDTO){
+
+        return ResponseEntity.ok(voteService.createPool(poolRequestDTO));
     }
 
     @GetMapping("/get-all-pools")
