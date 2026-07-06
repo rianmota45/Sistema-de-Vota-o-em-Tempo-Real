@@ -29,6 +29,7 @@ public class PoolEntity {
     private PoolStatus poolStatus;
     @OneToMany(mappedBy = "poolEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PoolOption> poolOptions;
+    private Integer totalVotesOnPool;
 
     public PoolEntity(LocalDate closeDate, String poolTitle, String poolQuestion, List<PoolOption> poolOptionList) {
         this.creationDate = LocalDate.now();

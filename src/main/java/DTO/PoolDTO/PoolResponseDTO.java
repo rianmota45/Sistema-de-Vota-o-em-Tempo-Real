@@ -12,6 +12,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 public class PoolResponseDTO {
+    private String userName;
     private Integer poolID;
     private LocalDate creationDate;
     private LocalDate closeDate;

@@ -24,8 +24,12 @@ public class RestExceptionHandler {
     }
 
     @ExceptionHandler(EmailAlreadyExistsException.class)
-    public ResponseEntity<String> handleEmailAlreadyExists(EmailAlreadyExistsException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    public ResponseEntity<Map<String, String>> handleEmailAlreadyExists(EmailAlreadyExistsException exeption) {
+        Map<String, String> error = new HashMap<>();
+        error.put("message", exeption.getMessage());
+        error.put("status", "422");
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 }
 

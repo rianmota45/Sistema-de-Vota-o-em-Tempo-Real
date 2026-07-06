@@ -44,4 +44,8 @@ public class PoolOption {
         this.optionText = optionText;
         this.numberOfVotes = 0;
     }
+
+    public void voteOnOption(){
+        numberOfVotes++;
+    }
 }

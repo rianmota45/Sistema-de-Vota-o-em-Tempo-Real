@@ -2,14 +2,14 @@ package org.example.sistemadevotacaoemtemporeal.Controller;
 
 import DTO.PoolDTO.PoolRequestDTO;
 import DTO.PoolDTO.PoolResponseDTO;
-import org.example.sistemadevotacaoemtemporeal.Infrastructure.Entity.Pool.PoolEntity;
+import org.example.sistemadevotacaoemtemporeal.Infrastructure.Entity.Pool.VoteRequest;
+import org.example.sistemadevotacaoemtemporeal.Infrastructure.Entity.Pool.VoteResponse;
 import org.example.sistemadevotacaoemtemporeal.Service.PoolService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -18,26 +18,26 @@ import java.util.UUID;
 public class PoolController {
 
     @Autowired
-    private final PoolService voteService;
+    private final PoolService poolService;
 
-    @PostMapping("/create-pool")
-    public ResponseEntity<PoolResponseDTO> createPool(@RequestBody PoolRequestDTO poolRequestDTO) {
+    @PostMapping("/create-pool/{userid}")
+    public ResponseEntity<PoolResponseDTO> createPool(@RequestBody PoolRequestDTO poolRequestDTO, @PathVariable UUID userid) {
 
-        return ResponseEntity.ok(voteService.createPool(poolRequestDTO));
+        return ResponseEntity.ok(poolService.createPool(poolRequestDTO, userid));
     }
 
-    @GetMapping("/get-all-pools")
-    public ResponseEntity<List<PoolEntity>> getAllPools() {
+    @GetMapping("/get-pool=/{poolid}/{userid}")
+    public ResponseEntity<PoolResponseDTO> getPool(@PathVariable Integer poolid, @PathVariable UUID userid){
 
-        return ResponseEntity.ok(voteService.getAllPools());
+        return ResponseEntity.ok(poolService.getPool(poolid, userid));
     }
 
-    @PostMapping("/vote-pid={id}-op={opid}-usr={usrId}")
-    public String vote(
-            @PathVariable Integer id,
-            @PathVariable Integer opid,
-            @PathVariable UUID usrId
+    @PostMapping("/vote/{userid}/{poolid}/{optionid}")
+    public VoteResponse vote(
+            @PathVariable UUID userid,
+            @PathVariable Integer poolid,
+            @PathVariable Integer optionid
     ) {
-        return voteService.voteIN(id, opid, usrId);
+        return poolService.vote(new VoteRequest(userid, poolid, optionid));
     }
 }

@@ -3,8 +3,11 @@ package org.example.sistemadevotacaoemtemporeal.Service;
 import DTO.PoolDTO.PoolOptionResponseDTO;
 import DTO.PoolDTO.PoolRequestDTO;
 import DTO.PoolDTO.PoolResponseDTO;
+import org.example.sistemadevotacaoemtemporeal.Exception.UserNotFoundException;
 import org.example.sistemadevotacaoemtemporeal.Infrastructure.Entity.Pool.PoolEntity;
 import org.example.sistemadevotacaoemtemporeal.Infrastructure.Entity.Pool.PoolOption;
+import org.example.sistemadevotacaoemtemporeal.Infrastructure.Entity.Pool.VoteRequest;
+import org.example.sistemadevotacaoemtemporeal.Infrastructure.Entity.Pool.VoteResponse;
 import org.example.sistemadevotacaoemtemporeal.Infrastructure.Entity.User.UserEntity;
 import org.example.sistemadevotacaoemtemporeal.Repository.PoolRepository;
 import org.example.sistemadevotacaoemtemporeal.Repository.UserRepository;
@@ -13,17 +16,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 @Component
 public class PoolService {
-
 
     @Autowired
     private final UserRepository userRepository;
@@ -31,7 +29,14 @@ public class PoolService {
     public final PoolRepository poolRepository;
 
 
-    public PoolResponseDTO createPool(PoolRequestDTO poolRequestDTO) {
+    public PoolResponseDTO createPool(PoolRequestDTO poolRequestDTO, UUID userid) {
+
+        if(!(userRepository.existsById(userid))){
+            throw new UserNotFoundException("User dont exists!");
+        }
+
+        Optional<UserEntity> userr = userRepository.findByuserid(userid);
+        UserEntity user = userr.orElseThrow(() -> new RuntimeException("Problem on <PoolService>"));
 
         List<PoolOption> poolOptions = poolRequestDTO.getPoolOptions().stream()
                 .map(dto -> new PoolOption(dto.getOptionText()))
@@ -56,6 +61,7 @@ public class PoolService {
                 .toList();
 
         return new PoolResponseDTO(
+                user.getUserName(),
                 pool.getPoolID(),
                 pool.getCreationDate(),
                 pool.getCloseDate(),
@@ -66,35 +72,58 @@ public class PoolService {
         );
     }
 
+    public PoolResponseDTO getPool(Integer poolid, UUID userid) {
 
-    public List<PoolEntity> getAllPools() {
-        return poolRepository.findAll();
-    }
+        Optional<UserEntity> userr = userRepository.findByuserid(userid);
+        UserEntity user = userr.orElseThrow(() -> new RuntimeException("Problem on <PoolService>"));
 
 
-    public String voteIN(Integer poolID, Integer optionID, UUID userID) {
 
-        Optional<PoolEntity> optionalPool = poolRepository.findById(poolID);
-        Optional<UserEntity> optionalUser = userRepository.findById(userID);
+        Optional<PoolEntity> poolFound = poolRepository.findById(poolid);
 
-        PoolEntity poolEntity1 = optionalPool.orElseThrow(() -> new RuntimeException("Pool not found!"));
-        UserEntity userEntity1 = optionalUser.orElseThrow(() -> new RuntimeException("User not found!"));
+        PoolEntity poolEntityFound = poolFound.orElseThrow(() -> new RuntimeException("Pool not found"));
 
-        List<PoolOption> poolOptions = poolEntity1.getPoolOptions();
-
-        for (PoolOption poolOption : poolOptions) {
-            if (Objects.equals(poolOption.getOptionID(), optionID)) {
-                Integer numOfVotes = poolOption.getNumberOfVotes();
-                poolOption.setNumberOfVotes(numOfVotes + 1);
-            }
-            //throw new RuntimeException("Error: This option doesn't exist!");
+        List<PoolOptionResponseDTO> poolOptions = new ArrayList<>();
+        for (PoolOption poolOption : poolEntityFound.getPoolOptions()) {
+            poolOptions.add(
+                    new PoolOptionResponseDTO(
+                            poolOption.getOptionID(),
+                            poolOption.getOptionText(),
+                            poolOption.getNumberOfVotes()
+                    )
+            );
         }
-        //return new VoteEntity(poolID, optionID, userID);
-        return "The user " + userEntity1.getUserName() +
-                "\nHas voted on the pool: " + poolEntity1.getPoolTitle() +
-                "\nWith the question: " + poolEntity1.getPoolQuestion() +
-                "\nAnd the options " + poolEntity1.getPoolOptions() +
-                "\nHe choose the option: " + poolEntity1.getPoolOptionById(optionID) +
-                "\nDate of the operation: " + LocalDate.now();
+
+        return new PoolResponseDTO(
+                user.getUserName(),
+                poolEntityFound.getPoolID(),
+                poolEntityFound.getCreationDate(),
+                poolEntityFound.getCloseDate(),
+                poolEntityFound.getPoolTitle(),
+                poolEntityFound.getPoolQuestion(),
+                poolEntityFound.getPoolStatus(),
+                poolOptions
+        );
     }
+
+    public VoteResponse vote(VoteRequest voteRequest) {
+        Optional<UserEntity> userFind = userRepository.findById(voteRequest.getUserid());
+        Optional<PoolEntity> poolFind = poolRepository.findById(voteRequest.getPoolid());
+
+
+        UserEntity userEntity = userFind.orElseThrow(() -> new UserNotFoundException("You are not logged! Please, create another account! ( ﾉ ﾟｰﾟ)ﾉ"));
+        PoolEntity poolEntity = poolFind.orElseThrow(() -> new RuntimeException("Some error happen, try later! it seems like this pool don't exists!"));
+
+
+        List<PoolOption> poolOptions = poolEntity.getPoolOptions();
+        for (PoolOption poolOption : poolOptions) {
+            if (poolOption.getOptionID().equals(voteRequest.getOptionid())) {
+                poolOption.voteOnOption();
+                poolRepository.save(poolEntity);
+                return new VoteResponse(userEntity.getUserName(), poolEntity.getPoolTitle(), poolOption.getOptionText());
+            }
+        }
+        throw new RuntimeException("Error");
+    }
+
 }
