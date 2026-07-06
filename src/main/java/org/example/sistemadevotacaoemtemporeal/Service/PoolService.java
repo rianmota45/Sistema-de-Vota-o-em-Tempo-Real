@@ -1,9 +1,8 @@
 package org.example.sistemadevotacaoemtemporeal.Service;
 
-import dto.user_dto.UserRequestDTO;
-import dto.user_dto.UserResponseDTO;
-import dto.user_dto.pool_dto.PoolRequestDTO;
-import dto.user_dto.pool_dto.PoolResponseDTO;
+import DTO.PoolDTO.PoolOptionResponseDTO;
+import DTO.PoolDTO.PoolRequestDTO;
+import DTO.PoolDTO.PoolResponseDTO;
 import org.example.sistemadevotacaoemtemporeal.Infrastructure.Entity.Pool.PoolEntity;
 import org.example.sistemadevotacaoemtemporeal.Infrastructure.Entity.Pool.PoolOption;
 import org.example.sistemadevotacaoemtemporeal.Infrastructure.Entity.User.UserEntity;
@@ -20,33 +19,16 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-// por enquanto tá tudo no mesmo service, mas eu vou mudar isso depois
 @Service
 @RequiredArgsConstructor
 @Component
-public class VoteService {
+public class PoolService {
 
 
     @Autowired
     private final UserRepository userRepository;
     @Autowired
     public final PoolRepository poolRepository;
-
-
-    public UserResponseDTO createUser(UserRequestDTO userRequestDTO) {
-        UserEntity user = new UserEntity(
-                userRequestDTO.getUserDTOName(),
-                userRequestDTO.getUserDTOEmail()
-        );
-
-        userRepository.save(user);
-
-        return new UserResponseDTO(
-                user.getUserName(),
-                user.getUserEmail(),
-                user.getUserID()
-        );
-    }
 
 
     public PoolResponseDTO createPool(PoolRequestDTO poolRequestDTO) {
@@ -61,18 +43,18 @@ public class VoteService {
                 poolRequestDTO.getPoolQuestion(),
                 poolOptions
         );
-        
+
         poolOptions.forEach(option -> option.setPoolEntity(pool));
         poolRepository.save(pool);
-        
-        List<dto.user_dto.pool_dto.PoolOptionResponseDTO> responseOptions = pool.getPoolOptions().stream()
-                .map(opt -> new dto.user_dto.pool_dto.PoolOptionResponseDTO(
+
+        List<PoolOptionResponseDTO> responseOptions = pool.getPoolOptions().stream()
+                .map(opt -> new PoolOptionResponseDTO(
                         opt.getOptionID(),
                         opt.getOptionText(),
                         opt.getNumberOfVotes()
                 ))
                 .toList();
-        
+
         return new PoolResponseDTO(
                 pool.getPoolID(),
                 pool.getCreationDate(),
@@ -87,25 +69,6 @@ public class VoteService {
 
     public List<PoolEntity> getAllPools() {
         return poolRepository.findAll();
-    }
-
-
-    public String findByUuid(UUID userID){ // find user by uuid
-        Optional<UserEntity> userFound = userRepository.findByuserID(userID);
-
-        UserEntity user = userFound.orElseThrow(() -> new RuntimeException("Usuário não encontrado!"));
-
-        return "Usuário referente ao id:\n Nome:" + user.getUserName() +
-                "\nEmail: " + user.getUserEmail();
-    }
-
-
-    public String deleteByUuid(UUID userID){// delete user by uuid
-        Optional<UserEntity> userToDelete = userRepository.findByuserID(userID);
-        UserEntity user = userToDelete.orElseThrow(() -> new RuntimeException("This user doesn´t exists"));
-        String name = user.getUserName();
-        userRepository.deleteById(userID);
-        return "User '" + name + "' Deleted!";
     }
 
 

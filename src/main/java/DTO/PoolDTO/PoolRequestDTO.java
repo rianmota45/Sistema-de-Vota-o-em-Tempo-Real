@@ -1,4 +1,4 @@
-package dto.user_dto.pool_dto;
+package DTO.PoolDTO;
 
 import lombok.Getter;
 import lombok.Setter;

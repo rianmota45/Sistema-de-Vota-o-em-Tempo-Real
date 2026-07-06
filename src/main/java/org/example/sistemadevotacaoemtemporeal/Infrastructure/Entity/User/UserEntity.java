@@ -2,6 +2,7 @@ package org.example.sistemadevotacaoemtemporeal.Infrastructure.Entity.User;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.UUID;
@@ -16,23 +17,21 @@ import java.util.UUID;
  * User user = new User (
  *      "Jhon Roblox",
  *      "jhon@roblox.com",
- *  );
+ * );
  * </pre></blockquote><p>
  */
 @Getter
 @Setter
 @Entity
+@NoArgsConstructor
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID userID;
+    private UUID userid;
     @Column(nullable = false)
     private String userName;
     @Column(unique = true)
     private String userEmail;
-
-    public UserEntity() {
-    }
 
     public UserEntity(String userName, String userEmail) {
         this.userName = userName;
@@ -47,14 +46,7 @@ public class UserEntity {
         return "User{" +
                 "\n\tuserName='" + userName + '\'' +
                 ",\n\tuserEmail='" + userEmail + '\'' +
-                ",\n\tuserID=" + userID +
+                ",\n\tuserID=" + userid +
                 "\n}";
-    }
-
-    public static void main(String[] args) {
-        UserEntity usuario = new UserEntity("", "email@gamil");
-
-        System.out.println(usuario);
-        System.out.println(usuario.getUserID());
     }
 }
