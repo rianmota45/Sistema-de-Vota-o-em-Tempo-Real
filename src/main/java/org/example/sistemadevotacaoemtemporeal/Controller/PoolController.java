@@ -32,6 +32,11 @@ public class PoolController {
         return ResponseEntity.ok(poolService.getPool(poolid, userid));
     }
 
+    @PostMapping("/voteOn")
+    public VoteResponse voteOn(@RequestBody VoteRequest voteRequest) {
+        return poolService.vote(voteRequest);
+    }
+
     @PostMapping("/vote/{userid}/{poolid}/{optionid}")
     public VoteResponse vote(
             @PathVariable UUID userid,

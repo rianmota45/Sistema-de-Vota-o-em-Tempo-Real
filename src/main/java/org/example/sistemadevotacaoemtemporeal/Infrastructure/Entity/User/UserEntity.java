@@ -23,10 +23,12 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
+@Table(name = "user_entity")
 @NoArgsConstructor
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "userid")
     private UUID userid;
     @Column(nullable = false)
     private String userName;

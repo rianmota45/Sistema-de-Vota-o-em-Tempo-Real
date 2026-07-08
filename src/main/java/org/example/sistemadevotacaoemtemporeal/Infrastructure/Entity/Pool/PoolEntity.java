@@ -26,9 +26,11 @@ public class PoolEntity {
     @Column(nullable = false)
     private String poolQuestion;
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private PoolStatus poolStatus;
     @OneToMany(mappedBy = "poolEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PoolOption> poolOptions;
+    @Column(name = "totalVotesOnPool")
     private Integer totalVotesOnPool;
 
     public PoolEntity(LocalDate closeDate, String poolTitle, String poolQuestion, List<PoolOption> poolOptionList) {
@@ -46,14 +48,5 @@ public class PoolEntity {
 
     public void cancellPool() {
         this.poolStatus = PoolStatus.CANCELLED;
-    }
-
-    public String getPoolOptionById(Integer optionID) {
-        for (PoolOption poolOption : poolOptions) {
-            if (poolOption.getOptionID().equals(optionID)) {
-                return poolOptions.get(optionID).toString();
-            }
-        }
-        throw new RuntimeException("Option not found");
     }
 }

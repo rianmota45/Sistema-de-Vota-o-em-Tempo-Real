@@ -4,14 +4,12 @@ import DTO.PoolDTO.PoolOptionResponseDTO;
 import DTO.PoolDTO.PoolRequestDTO;
 import DTO.PoolDTO.PoolResponseDTO;
 import org.example.sistemadevotacaoemtemporeal.Exception.UserNotFoundException;
-import org.example.sistemadevotacaoemtemporeal.Infrastructure.Entity.Pool.PoolEntity;
-import org.example.sistemadevotacaoemtemporeal.Infrastructure.Entity.Pool.PoolOption;
-import org.example.sistemadevotacaoemtemporeal.Infrastructure.Entity.Pool.VoteRequest;
-import org.example.sistemadevotacaoemtemporeal.Infrastructure.Entity.Pool.VoteResponse;
+import org.example.sistemadevotacaoemtemporeal.Infrastructure.Entity.Pool.*;
 import org.example.sistemadevotacaoemtemporeal.Infrastructure.Entity.User.UserEntity;
 import org.example.sistemadevotacaoemtemporeal.Repository.PoolRepository;
 import org.example.sistemadevotacaoemtemporeal.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.example.sistemadevotacaoemtemporeal.Repository.VoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -27,6 +25,7 @@ public class PoolService {
     private final UserRepository userRepository;
     @Autowired
     public final PoolRepository poolRepository;
+    public final VoteRepository voteRepository;
 
 
     public PoolResponseDTO createPool(PoolRequestDTO poolRequestDTO, UUID userid) {
@@ -111,19 +110,22 @@ public class PoolService {
         Optional<PoolEntity> poolFind = poolRepository.findById(voteRequest.getPoolid());
 
 
-        UserEntity userEntity = userFind.orElseThrow(() -> new UserNotFoundException("You are not logged! Please, create another account! ( ﾉ ﾟｰﾟ)ﾉ"));
+        UserEntity userEntity = userFind.orElseThrow(() -> new UserNotFoundException("You are not logged! Please, login or create an account! ( ﾉ ﾟｰﾟ)ﾉ"));
         PoolEntity poolEntity = poolFind.orElseThrow(() -> new RuntimeException("Some error happen, try later! it seems like this pool don't exists!"));
 
+        if(voteRepository.existsByUserAndPool(userEntity, poolEntity)){
+            throw new RuntimeException("You already voted on this pool!");
+        }
 
         List<PoolOption> poolOptions = poolEntity.getPoolOptions();
         for (PoolOption poolOption : poolOptions) {
             if (poolOption.getOptionID().equals(voteRequest.getOptionid())) {
                 poolOption.voteOnOption();
                 poolRepository.save(poolEntity);
+                voteRepository.save(new Vote(userEntity, poolEntity, poolOption));
                 return new VoteResponse(userEntity.getUserName(), poolEntity.getPoolTitle(), poolOption.getOptionText());
             }
         }
         throw new RuntimeException("Error");
     }
-
 }

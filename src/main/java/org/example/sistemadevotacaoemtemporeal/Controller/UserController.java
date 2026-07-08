@@ -4,6 +4,7 @@ import DTO.UserDTO.UserRequestDTO;
 import DTO.UserDTO.UserResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.example.sistemadevotacaoemtemporeal.Service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +15,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserController {
 
+    @Autowired
     private final UserService userService;
 
     @PostMapping("/create-user")
