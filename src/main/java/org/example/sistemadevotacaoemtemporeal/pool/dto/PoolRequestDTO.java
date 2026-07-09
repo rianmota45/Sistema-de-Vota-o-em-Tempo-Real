@@ -1,4 +1,4 @@
-package DTO.PoolDTO;
+package org.example.sistemadevotacaoemtemporeal.pool.dto;
 
 import lombok.Getter;
 import lombok.Setter;

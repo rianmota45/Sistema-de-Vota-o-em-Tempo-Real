@@ -1,4 +1,4 @@
-package DTO.UserDTO;
+package org.example.sistemadevotacaoemtemporeal.user.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

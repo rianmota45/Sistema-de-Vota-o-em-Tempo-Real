@@ -1,9 +1,9 @@
-package DTO.PoolDTO;
+package org.example.sistemadevotacaoemtemporeal.pool.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.example.sistemadevotacaoemtemporeal.Infrastructure.Entity.Pool.PoolStatus;
+import org.example.sistemadevotacaoemtemporeal.pool.domain.PoolStatus;
 
 import java.time.LocalDate;
 import java.util.List;
